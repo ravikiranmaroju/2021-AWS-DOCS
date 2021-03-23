@@ -43,3 +43,59 @@ EXPOSE 80
 # CMD ["sed", "-n", "74p", "/etc/apache2/apache2.conf"]
 # CMD ["cat", "/etc/apache2/envvars"]
 CMD /usr/sbin/apache2ctl -D FOREGROUND
+
+
+
+Esc:wq!
+
+Build the container image: now we are building a new image with the changes given in the docker file
+
+docker build -t aws-ecr-hello-world:v0.9.1 .
+
+Run the container:
+
+docker run -it -d -p 8080:80 --name=mycontainer test
+
+docker exec -it containid /bin/bash
+
+docker container run -d —name container-name -p 8080:8080 imagename
+
+here 8080 is the container port number
+80 is the host port number it means what ever the traffic comes to 80 divert to 8080
+
+Or
+
+docker build -t tag https://github.com/honeysundar/java_application.git
+
+
+
+Login to the apache2
+
+http://ec2-34-209-212-58.us-west-2.compute.amazonaws.com:8080
+
+
+Example For Nginx
+
+FROM ubuntu:16.04
+  
+MAINTAINER RaviKiran
+
+# Install dependencies
+RUN apt-get update -y && apt-get install -y nginx
+
+# Usage: When i login i directly goes to that working directory and runs all my commands from here
+WORKDIR /var/www/html/
+
+
+#RUN
+RUN rm -rf /var/www/html/*
+
+# ADD Copying the Files from my local server to nginx server
+ADD index.html /var/www/html/index.html
+
+#Expose the Container port to 80
+EXPOSE 80
+
+#First command to run when the container is started
+ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
+
