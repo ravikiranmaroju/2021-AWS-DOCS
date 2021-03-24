@@ -1,0 +1,70 @@
+To Stop
+
+import boto3
+region = 'ap-southeast-1'
+instances = ['i-04f69626ac8fb740d']
+ec2 = boto3.client('ec2', region_name=region)
+
+def lambda_handler(event, context):
+    ec2.stop_instances(InstanceIds=instances)
+    print('stopped your instances: ' + str(instances))
+    
+    
+    
+    To Start
+    
+import boto3
+region = 'ap-southeast-1'
+instances = ['i-04f69626ac8fb740d']
+ec2 = boto3.client('ec2', region_name=region)
+
+def lambda_handler(event, context):
+    ec2.start_instances(InstanceIds=instances)
+    print('started your instances: ' + str(instances))
+    
+    
+    Here Change the Region and Id as per your Requirments
+    
+    and also roles are vert important to stop or start the instances 
+    
+    
+    
+    
+    Create CloudWatch Events rules that trigger your Lambda functions and you can automatically schedule the events to trigger for you
+
+1.    Open the Amazon CloudWatch console.
+
+2.    In the left navigation pane, under Events, choose Rules.
+
+3.    Choose Create rule.
+
+4.    Under Event Source, choose Schedule.
+
+5.    Do either of the following: 
+For Fixed rate of, enter an interval of time in minutes, hours, or days. 
+For Cron expression, enter an expression that tells Lambda when to stop your instances. For information on expression syntax, see Schedule expressions for rules. 
+Note: Cron expressions are evaluated in UTC. Make sure that you adjust the expression for your preferred time zone.
+
+6.    Under Targets, choose Add target.
+
+7.    Choose Lambda function.
+
+8.    For Function, choose the function that stops your EC2 instances.
+
+9.    Choose Configure details.
+
+10.    Under Rule definition, do the following: 
+For Name, enter a name to identify the rule, such as "StopEC2Instances". 
+(Optional) For Description, describe your rule. For example, "Stops EC2 instances every night at 10 PM." 
+For State, choose the Enabled check box.
+
+11.    Choose Create rule.
+
+12.    Repeat steps 1-11 to create a rule to start your EC2 instances. Do the following differently: 
+In step 5, for Cron expression, enter an expression that tells Lambda when to start your instances. 
+In step 8, for Function, choose the function that starts your EC2 instances. 
+In step 10, under Rule definition, enter a Name, such as "StartEC2Instances". 
+(Optional) Enter a Description, such as "Starts EC2 instances every morning at 7 AM."
+
+
+    
