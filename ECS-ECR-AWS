@@ -12,3 +12,5 @@ Now copy image URI ex: 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com/myrepo:
 Now go to ECS Click on Create Cluster > View Cluster
 Create Task definition > Choose EC2 or Fragate > Follow Steps > Create container > Copy that Image ID > 8080:80 > add > Create
 Actions > Run task > My Cluster > ECS instances > Copy the DNS and paste with DNS:8080 
+
+Note: Make sure we have enough permissions on Roles 
