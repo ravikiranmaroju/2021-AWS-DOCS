@@ -1,0 +1,14 @@
+Create EC2 attach role 
+Install docker start and enable the docker
+Login to EC2 and install docker
+Create a private repo in ECR
+Create a docker file and run it > docker build . -t mynewimage
+Make a note of the Private repo for ex: 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com/myrepo
+Now do docker tag ex: docker tag mynewimage:latest 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com/myrepo:latest
+Now login to ECR for ex: aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com
+Now push the image to ECR ex: docker push 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com/myrepo:latest
+Check if the Image is pushed in ECR 
+Now copy image URI ex: 212998767503.dkr.ecr.ap-southeast-1.amazonaws.com/myrepo:latest
+Now go to ECS Click on Create Cluster > View Cluster
+Create Task definition > Choose EC2 or Fragate > Follow Steps > Create container > Copy that Image ID > 8080:80 > add > Create
+Actions > Run task > My Cluster > ECS instances > Copy the DNS and paste with DNS:8080 
