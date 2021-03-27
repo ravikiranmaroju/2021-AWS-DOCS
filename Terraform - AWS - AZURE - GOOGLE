@@ -1,3 +1,39 @@
+TERRAFORM INST & CONFIG
+
+Prerequisites
+AWS configure with enough IAM permissions 
+Terraform software
+
+INSTALL terraform     
+
+Install unzip
+sudo apt-get install unzip
+
+Download latest version of the terraform
+wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip
+
+Extract the downloaded file archive
+unzip terraform_0.11.8_linux_amd64.zip
+
+Move the executable into a directory searched for executables
+sudo mv terraform /usr/local/bin/
+
+Run it
+terraform --version 
+
+
+configure aws with enough permissions create a IAM user with all the permissions
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
 TERRAFORM EX:1
 
 Below we will creating the EC2 instance in AWS cloud with 2 instance with 
