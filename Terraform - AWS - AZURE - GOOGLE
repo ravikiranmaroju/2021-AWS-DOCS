@@ -27,14 +27,7 @@ configure aws with enough permissions create a IAM user with all the permissions
 
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-
-
-
-
-TERRAFORM EX:1
+TERRAFORM EX: Creating EC2 instances with Public and Private VPC and Subnets with Public and private IP' with Application installed.
 
 Below we will creating the EC2 instance in AWS cloud with 2 instance with 
 one private VPC and other with Public VPC with different security groups and Userdata with apache2 in it
@@ -42,9 +35,15 @@ one private VPC and other with Public VPC with different security groups and Use
 Now create below
 Provider >> AWS
 Resources >> AWS and regions , vpc, instance types, names etc
-USER-DATE >> All the inputs while the instance is coming up
+USER-DATE >> All the inputs while the instance is coming up like installing some packages, modifing the files or directories and usercreation and amny more
 VARIABLES >> All the variable should be defined here
 VPC >>> All vpc details should be mentioed here like VPC name type 
+linux.pem > key pair should be copied 
+public_key > should be copied > ssh-keygen -t rsa > copy public key to that path 
+Create and Attach role to the ec2 you are trying 
+
+linux.pem
+public_key
 
 
 vi provider.tf
