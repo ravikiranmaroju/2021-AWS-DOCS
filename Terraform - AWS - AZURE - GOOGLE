@@ -60,7 +60,7 @@ vi resources.tf
 
 # Define SSH key pair for our instances
 resource "aws_key_pair" "default" {
-  key_name = "mumbai"
+  key_name = "linux"
   public_key = "${file("${var.key_path}")}"
 }
 
@@ -100,10 +100,10 @@ resource "aws_instance" "db" {
 vi userdata.sh
 
 #!/bin/bash
-apt-get update -y
-apt-get install apache2 -y
-systemctl start apache2
-systemctl enable apache2
+yum update update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
 echo "Hello from RAVI" > /var/www/html/index.html
 
 
@@ -113,7 +113,7 @@ vi variables.tf
 
 variable "aws_region" {
   description = "Region for the VPC"
-  default = "ap-southeast-1"
+  default = "us-east-2"
 }
 
 variable "vpc_cidr" {
@@ -133,7 +133,7 @@ variable "private_subnet_cidr" {
 
 variable "ami" {
   description = "Amazon ubuntu"
-  default = "ami-03221428e6676db69"
+  default = "ami-089c6f2e3866f0f14"
 }
 
 variable "key_path" {
@@ -163,7 +163,7 @@ resource "aws_vpc" "default" {
 resource "aws_subnet" "public-subnet" {
   vpc_id = "${aws_vpc.default.id}"
   cidr_block = "${var.public_subnet_cidr}"
-  availability_zone = "ap-southeast-1a"
+  availability_zone = "us-east2a"
 
   tags {
     Name = "Web Public Subnet"
@@ -174,7 +174,7 @@ resource "aws_subnet" "public-subnet" {
 resource "aws_subnet" "private-subnet" {
   vpc_id = "${aws_vpc.default.id}"
   cidr_block = "${var.private_subnet_cidr}"
-  availability_zone = "ap-southeast-1c"
+  availability_zone = "us-east-2b"
 
   tags {
     Name = "Database Private Subnet"
