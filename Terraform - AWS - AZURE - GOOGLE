@@ -1,0 +1,306 @@
+TERRAFORM EX:1
+
+Below we will creating the EC2 instance in AWS cloud with 2 instance with 
+one private VPC and other with Public VPC with different security groups and Userdata with apache2 in it
+
+Now create below
+Provider >> AWS
+Resources >> AWS and regions , vpc, instance types, names etc
+USER-DATE >> All the inputs while the instance is coming up
+VARIABLES >> All the variable should be defined here
+VPC >>> All vpc details should be mentioed here like VPC name type 
+
+
+vi provider.tf
+
+# Define AWS as our provider
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+
+
+vi resources.tf
+
+# Define SSH key pair for our instances
+resource "aws_key_pair" "default" {
+  key_name = "mumbai"
+  public_key = "${file("${var.key_path}")}"
+}
+
+# Define webserver inside the public subnet
+resource "aws_instance" "wb" {
+   ami  = "${var.ami}"
+   instance_type = "t2.micro"
+   key_name = "${aws_key_pair.default.id}"
+   subnet_id = "${aws_subnet.public-subnet.id}"
+   vpc_security_group_ids = ["${aws_security_group.sgweb.id}"]
+   associate_public_ip_address = true
+   source_dest_check = false
+   user_data = "${file("userdata.sh")}"
+
+  tags {
+    Name = "webserver"
+  }
+}
+
+# Define database inside the private subnet
+resource "aws_instance" "db" {
+   ami  = "${var.ami}"
+   instance_type = "t2.micro"
+   key_name = "${aws_key_pair.default.id}"
+   subnet_id = "${aws_subnet.private-subnet.id}"
+   vpc_security_group_ids = ["${aws_security_group.sgdb.id}"]
+   source_dest_check = false
+
+  tags {
+    Name = "database"
+  }
+}
+
+   
+
+
+vi userdata.sh
+
+#!/bin/bash
+apt-get update -y
+apt-get install apache2 -y
+systemctl start apache2
+systemctl enable apache2
+echo "Hello from RAVI" > /var/www/html/index.html
+
+
+
+
+vi variables.tf
+
+variable "aws_region" {
+  description = "Region for the VPC"
+  default = "ap-southeast-1"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR for the VPC"
+  default = "10.0.0.0/16"
+}
+
+variable "public_subnet_cidr" {
+  description = "CIDR for the public subnet"
+  default = "10.0.1.0/24"
+}
+
+variable "private_subnet_cidr" {
+  description = "CIDR for the private subnet"
+  default = "10.0.2.0/24"
+}
+
+variable "ami" {
+  description = "Amazon ubuntu"
+  default = "ami-03221428e6676db69"
+}
+
+variable "key_path" {
+  description = "SSH Public Key path"
+  default = "public_key"
+}
+
+
+
+
+
+
+vi vpc.tf
+
+
+# Define our VPC
+resource "aws_vpc" "default" {
+  cidr_block = "${var.vpc_cidr}"
+  enable_dns_hostnames = true
+
+  tags {
+    Name = "test-vpc"
+  }
+}
+
+# Define the public subnet
+resource "aws_subnet" "public-subnet" {
+  vpc_id = "${aws_vpc.default.id}"
+  cidr_block = "${var.public_subnet_cidr}"
+  availability_zone = "ap-southeast-1a"
+
+  tags {
+    Name = "Web Public Subnet"
+  }
+}
+
+# Define the private subnet
+resource "aws_subnet" "private-subnet" {
+  vpc_id = "${aws_vpc.default.id}"
+  cidr_block = "${var.private_subnet_cidr}"
+  availability_zone = "ap-southeast-1c"
+
+  tags {
+    Name = "Database Private Subnet"
+  }
+}
+
+# Define the internet gateway
+resource "aws_internet_gateway" "gw" {
+  vpc_id = "${aws_vpc.default.id}"
+
+  tags {
+    Name = "VPC IGW"
+  }
+}
+
+# Define the route table
+resource "aws_route_table" "web-public-rt" {
+  vpc_id = "${aws_vpc.default.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.gw.id}"
+  }
+
+  tags {
+    Name = "Public Subnet RT"
+  }
+}
+
+# Assign the route table to the public Subnet
+resource "aws_route_table_association" "web-public-rt" {
+  subnet_id = "${aws_subnet.public-subnet.id}"
+  route_table_id = "${aws_route_table.web-public-rt.id}"
+}
+
+# Define the security group for public subnet
+resource "aws_security_group" "sgweb" {
+  name = "vpc_test_web"
+  description = "Allow incoming HTTP connections & SSH access"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks =  ["0.0.0.0/0"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  vpc_id="${aws_vpc.default.id}"
+
+  tags {
+    Name = "Web Server SG"
+  }
+}
+
+# Define the security group for private subnet
+resource "aws_security_group" "sgdb"{
+  name = "sg_test_web"
+  description = "Allow traffic from public subnet"
+
+  ingress {
+    from_port = 3306
+    to_port = 3306
+    protocol = "tcp"
+    cidr_blocks = ["${var.public_subnet_cidr}"]
+  }
+
+  ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
+    cidr_blocks = ["${var.public_subnet_cidr}"]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["${var.public_subnet_cidr}"]
+  }
+
+  vpc_id = "${aws_vpc.default.id}"
+
+  tags {
+    Name = "DB SG"
+  }
+}
+
+
+
+TERRAFORM COMMANDS
+
+terraform init    $$$$$$   To download the necessary plugins, initialize the Terraform script directory
+
+terraform plan      $$$$$$    It will give the complete output like what all taks it is going to perform very deeply
+
+terraform validate     $$$$$$    It will validate and make sure if everything looks fine and if anything wrong with any of the script 
+it will through an error stating that this script or this line is having some issues, if everything looks fine it will prompt exit
+
+terraform apply    $$$$$$    to run the terraform
+
+terraform destroy   $$$$$$   to kill everything Destroy complete! Resources: 11 destroyed
+
+terraform workspace delete -force  $$$$$$ mention deirectory and other options to delete your workspace 
+
+IF ANY THING CHANGED THEN IT WILL TERMINATE THE THIINGS AND RE CREATE IT 
+for ex change the user data with something and then terraform apply and see what happens 
+
+
+
+
+EXTRA:
+
+TERRAFORM. Common commands:
+    apply              Builds or changes infrastructure
+    console            Interactive console for Terraform interpolations
+    destroy            Destroy Terraform-managed infrastructure
+    env                Workspace management
+    fmt                Rewrites config files to canonical format
+    get                Download and install modules for the configuration
+    graph              Create a visual graph of Terraform resources
+    import             Import existing infrastructure into Terraform
+    init               Initialize a Terraform working directory
+    output             Read an output from a state file
+    plan               Generate and show an execution plan
+    providers          Prints a tree of the providers used in the configuration
+    push               Upload this Terraform module to Atlas to run
+    refresh            Update local state file against real resources
+    show               Inspect Terraform state or plan
+    taint              Manually mark a resource for recreation
+    untaint            Manually unmark a resource as tainted
+    validate           Validates the Terraform files
+    version            Prints the Terraform version
+    workspace          Workspace management
+
+All other commands:
+    debug              Debug output management (experimental)
+    force-unlock       Manually unlock the terraform state
+    state              Advanced state management
