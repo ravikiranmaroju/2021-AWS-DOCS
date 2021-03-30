@@ -59,6 +59,8 @@ services:
 
 # docker ps 
 
+# docker-compose ps
+
 How to scale the containers —scale scale no. of serverices for a container
 docker-compose up -d --scale database=4  ( here database is the service name given in yml file)
 check with the cmd # docker ps
