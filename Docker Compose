@@ -1,0 +1,67 @@
+Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, 
+you use a YAML file to configure your application's services. Then, with a single command, 
+you create and start all the services from your configuration. ... 
+Run docker-compose up and Compose starts and runs your entire app
+
+Docker Compose ─ Installation
+
+Step 1 − Download the necessary files from github using the following command −
+curl -L "https://github.com/docker/compose/releases/download/1.10.0-rc2/dockercompose
+   -$(uname -s) -$(uname -m)" -o /home/demo/docker-compose
+
+Step 2 − Next, we need to provide execute privileges to the downloaded Docker Compose file, using the following command −
+chmod +x /home/demo/docker-compose
+
+docker-compose version
+
+vi docker-compose.yml 
+
+version: '3'
+services:
+      web:
+       image: nginx
+       ports:
+        - 9090:80/tcp
+
+     database:
+       image: redis
+
+
+# docker-compose config > If no errors move to the creation comand that is up 
+
+# docker-compose up 
+
+When its up > ip:9090
+
+or another example:
+
+vi docker-compose.yml 
+
+MYSQL with NGINX
+
+version: '2'
+services:
+   databases:
+     image: mysql
+     ports:
+     - "3306:3306"
+     environment:
+     - MYSQL_ROOT_PASSOWRD=password
+     - MYSQL_USER=admin
+     - MYSQL_PASSWORD=password
+     - MYSQL_DATABASE=mysql
+   web:
+    image: nginx 
+
+# docker-compose config > If no errors move to the creation comand that is up 
+
+# docker-compose up 
+
+# docker ps 
+
+How to scale the containers —scale scale no. of serverices for a container
+docker-compose up -d --scale database=4  ( here database is the service name given in yml file)
+check with the cmd # docker ps
+
+docker-compose down ( to kill the services)
+
