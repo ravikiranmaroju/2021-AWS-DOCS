@@ -12,6 +12,10 @@ curl -L "https://github.com/docker/compose/releases/download/1.10.0-rc2/dockerco
 Step 2 − Next, we need to provide execute privileges to the downloaded Docker Compose file, using the following command −
 chmod +x /home/demo/docker-compose
 
+or
+
+apt  install docker-compose
+
 docker-compose version
 
 vi docker-compose.yml 
