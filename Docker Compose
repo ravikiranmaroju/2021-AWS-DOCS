@@ -22,16 +22,50 @@ vi docker-compose.yml
 
 version: '3'
 services:
-      web:
-       image: nginx
-       ports:
-        - 9090:80/tcp
+  web:
+    # Path to dockerfile.
+    # '.' represents the current directory in which
+    # docker-compose.yml is present.
+    build: .
 
-     database:
-       image: redis
+    # Mapping of container port to host
+    
+    ports:
+      - "5000:5000"
+    # Mount volume 
+    volumes:
+      - "/usercode/:/code"
 
+    # Link database container to app container 
+    # for reachability.
+    links:
+      - "database:backenddb"
+    
+  database:
+
+    # image to fetch from docker hub
+    image: mysql/mysql-server:5.7
+
+    # Environment variables for startup script
+    # container will use these variables
+    # to start the container with these define variables. 
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_USER=testuser"
+      - "MYSQL_PASSWORD=admin123"
+      - "MYSQL_DATABASE=backend"
+    # Mount init.sql file to automatically run 
+    # and create tables for us.
+    # everything in docker-entrypoint-initdb.d folder
+    # is executed as soon as container is up nd running.
+    volumes:
+      - "/usercode/db/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    
+# Create a Dockerfile
 
 # docker-compose config > If no errors move to the creation comand that is up 
+
+# docker-compose build
 
 # docker-compose up 
 
@@ -61,9 +95,17 @@ services:
 
 # docker-compose up 
 
+# docker-compose images
+
 # docker ps 
 
 # docker-compose ps
+
+# docker-compose stop
+
+# docker-compose down
+
+
 
 How to scale the containers —scale scale no. of serverices for a container
 docker-compose up -d --scale database=4  ( here database is the service name given in yml file)
