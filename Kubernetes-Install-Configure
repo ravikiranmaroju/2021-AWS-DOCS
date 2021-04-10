@@ -1,99 +1,153 @@
 Kubernetes Install 2021
 
-
-
 On Master Node:
+
 ++++++++++++++++++++++++++++++++++++++++++
+yum update -y
+
+
 hostnamectl set-hostname 'kuber-master'
+
 exec bash
+
 setenforce 0
+
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
 modprobe br_netfilter
+
 echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
 
+
+
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+
 [kubernetes]
+
 name=Kubernetes
+
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+
 enabled=1
+
 gpgcheck=1
+
 repo_gpgcheck=1
+
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
 EOF
 
 
+
+
+
 sudo yum install -y kubelet kubeadm kubectl
+
 yum install docker -y
+
 systemctl restart docker && systemctl enable docker
+
 systemctl restart kubelet && systemctl enable kubelet
+
+
 
 kubeadm init
 
 swapoff -a
 
- mkdir -p $HOME/.kube
- sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
- sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p $HOME/.kube
+
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 export kubever=$(kubectl version | base64 | tr -d '\n')
+
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$kubever"
 
 kubectl get nodes
+
 kubectl get pods --all-namespaces
 
 systemctl status kubelet
 
-Example: 
+
+Manually:
 
 kubeadm join 172.31.31.141:6443 --token hemqer.hcnaoyagqmwrsw5w \
+
     --discovery-token-ca-cert-hash sha256:92b23b6c4f49384d90f45ccfdd42f4a115bdb81d0d4c1c6b79c4a3345ef49da4
 
 
+
+
+
 On both Nodes 
+
 ++++++++++++++++++++++++++++++++++++++++++
 
 yum update -y
-hostnamectl set-hostname kuber-worker1 
-exec bash
-setenforce 0
-sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
-vi /etc/hosts
-18.217.113.250  kuber-worker1
 
-vi /etc/yum.repos.d/kubernetes.repo
+hostnamectl set-hostname kuber-worker2
+
+exec bash
+
+setenforce 0
+
+sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 
 [kubernetes]
+
 name=Kubernetes
+
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+
 enabled=1
+
 gpgcheck=1
+
 repo_gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
-       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+EOF
+
+
 
 yum install kubeadm docker -y
 
+
+
 systemctl restart docker && systemctl enable docker
+
 systemctl restart kubelet.service
+
 systemctl enable kubelet.service
+
 systemctl status kubelet.service
+
 
 swapoff -a
+
 systemctl restart kubelet.service
+
 systemctl status kubelet.service
 
-kubeadm join 172.31.31.141:6443 --token hemqer.hcnaoyagqmwrsw5w     --discovery-token-ca-cert-hash sha256:92b23b6c4f49384d90f45ccfdd42f4a115bdb81d0d4c1c6b79c4a3345ef49da4
+
+kubeadm join 172.31.3.181:6443 --token ogixfy.kro9dl4jd5pmqg5h \
+        --discovery-token-ca-cert-hash sha256:e2f57fd3570085f5c0aa90b2d7e51abc703bee9481cc4323fab667fe0139cd14
+
 
 ++++++++++++++++++++++++++++++++++++++++++++++
 
+
+
 In Master 
 
+
+
 kubectl get nodes > shows the output like what all nodes are attached to the master
-
-To Install and configure Kubernetes Dashboard
-
-
-
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
