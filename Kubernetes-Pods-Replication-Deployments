@@ -1,0 +1,148 @@
+PODS:
+
+vi pod.yml
+
+ 
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: hello-pod2
+
+  labels:
+
+     zone: pod
+
+     version: v1
+
+spec:
+
+  containers:
+
+  - name: hello-ctr2
+
+    image: nginx:latest
+
+    ports:
+
+    - containerPort: 80
+
+               
+
+
+
+
+
++++++++++++++++++++++++++++++++++
+
+
+
+REPLICATION CONTROLLERS
+
+
+
+vi rc.yml
+
+ 
+
+apiVersion: v1
+
+kind: ReplicationController
+
+metadata:
+
+  name: hello-rc
+
+spec:
+
+  replicas: 10
+
+  selector:
+
+    app: hello-world
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: hello-world
+
+    spec:
+
+      containers:
+
+      - name: hello-ctr
+
+        image: nginx:latest
+
+        ports:
+
+        - containerPort: 80
+
+
+
++++++++++++++++++++++++++++++++++++++++
+
+
+
+DEPLOYMENTS
+
+
+
+vi deployment.yaml
+
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  labels:
+
+    environments: test
+
+  name: testdeploy
+
+spec:
+
+  replicas: 5
+
+  selector:
+
+     matchLabels:
+
+       environments: test
+
+  minReadySeconds: 10
+
+  strategy:
+
+    rollingUpdate:
+
+      maxUnavailable: 0
+
+      maxSurge: 1
+
+    type: RollingUpdate
+
+  template:
+
+    metadata:
+
+     labels:
+
+       environments: test
+
+    spec:
+
+     containers:
+
+     - image: nginx:1.16
+
+       name: nginx
+
