@@ -1,0 +1,110 @@
+Dashboard Creation Kuberenets
+
+
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+
+
+
+kubectl get pods -o wide --all-namespaces
+
+
+
+curl localhost:8080
+
+
+
+kubectl cluster-info
+
+
+
+wget https://github.com/projectcalico/calico-containers/releases/download/v0.22.0/calicoctl
+
+
+
+sudo chmod +x calicoctl
+
+
+
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+
+
+
+kubectl get pods -o wide --all-namespaces
+
+
+
+kubectl proxy --port=8080 &
+
+
+
+kubectl config view
+
+   
+
+kubectl create clusterrolebinding dashboard-admin -n default --clusterrole=cluster-admin --serviceaccount=default:dashboard
+
+   
+
+kubectl create serviceaccount dashboard -n default
+
+
+
+kubectl get secret $(kubectl get serviceaccount dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+
+    
+
+kubectl config view
+
+
+
+Now login 
+
+use master public ip with port number and complete path 
+
+https://ec2-34-222-217-40.us-west-2.compute.amazonaws.com:6443/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login
+
+
+use id and password found in 
+
+kubectl config view
+
+This command will give you the token required for your dashboard login
+
+$ kubectl get secret $(kubectl get serviceaccount dashboard -o jsonpath="{.secrets[0].name}") -o jsonpath="{.data.token}" | base64 --decode
+
+Click on token and copy and paste press sign in
+
+
+IF ANY errors create a role for permissions related issues 
+
+Create a role
+
+vi clusterrole.yaml
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubernetes-dashboard-anonymous
+rules:
+- apiGroups: [""]
+  resources: ["services/proxy"]
+  resourceNames: ["https:kubernetes-dashboard:"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- nonResourceURLs: ["/ui", "/ui/*", "/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/*"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard-anonymous
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubernetes-dashboard-anonymous
+subjects:
+- kind: User
+  name: system:anonymous
+
+
+kubectl apply -f clusterrole.yaml
