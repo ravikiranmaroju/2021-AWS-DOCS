@@ -34,8 +34,9 @@ chmod +x ./fullinstall
 
 or
 
-
-curl https://assets.nagios.com/downloads/n...​ | sh
+yum update -y
+yum install wget && yum install curl -y
+curl https://assets.nagios.com/downloads/nagiosxi/install.sh| sh
 
 or
 
