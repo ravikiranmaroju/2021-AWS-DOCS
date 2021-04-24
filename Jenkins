@@ -7,12 +7,14 @@ sudo yum upgrade
 sudo yum install jenkins java-1.8.0-openjdk-devel
 sudo systemctl daemon-reload
 
-To change default port
-vi /etc/sysconfig/jenkins > Change port number 8080 to any other free port
-systemctl restart jenkins
-
 http://ec2-13-233-83-107.ap-south-1.compute.amazonaws.com:8080
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword 
+
++++++++++++++++++++++++++++++++++++++++++++
+
+Maven Install
+
+yum install maven -y
 
 +++++++++++++++++++++++++++++++++++++++++++
 
