@@ -21,3 +21,30 @@ yum install maven -y
 
 
 
+-->
+<!--
+  <role rolename="tomcat"/>
+  <role rolename="role1"/>
+  <user username="tomcat" password="<must-be-changed>" roles="tomcat"/>
+  <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+  <user username="role1" password="<must-be-changed>" roles="role1"/>
+-->
+    <user username="admin" password="password" roles="manager-gui,admin-gui"/>
+</tomcat-users>
+
+
+
+cat /opt/apache-tomcat-8.5.58/webapps/host-manager/META-INF/context.xml
+
+
+-->
+<Context antiResourceLocking="false" privileged="true" >
+ <!--<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />-->
+  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
+</Context>
+
+
+https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04
+
+https://linuxtechlab.com/complete-guide-apache-tomcat-installation-linux/
