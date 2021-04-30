@@ -1,11 +1,17 @@
 Jenkins Install and Configure
 
+
+sudo yum update -y
 sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/redhat-stable/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-sudo yum upgrade
-sudo yum install jenkins java-1.8.0-openjdk-devel
+sudo yum upgrade -y 
+sudo yum install jenkins java-1.8.0-openjdk-devel -y
 sudo systemctl daemon-reload
+systemctl start jenkins
+systemctl  enable jenkins
+systemctl status jenkins
+
 
 http://ec2-13-233-83-107.ap-south-1.compute.amazonaws.com:8080
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword 
@@ -18,33 +24,70 @@ yum install maven -y
 
 +++++++++++++++++++++++++++++++++++++++++++
 
+Tomcat Install and configure 
 
+yum update -y
+yum install java-1.8.0 -y
+java -version
 
+cd /opt
+sudo yum -y install wget
+export VER="9.0.30"
+wget https://archive.apache.org/dist/tomcat/tomcat-9/v${VER}/bin/apache-tomcat-${VER}.tar.gz
+tar -zvxf apache-tomcat-9.0.30.tar.gz
+mv apache-tomcat-9.0.30 tomcat
+cd tomcat
+ps -ef|grep -i tomcat
+cd /opt/tomcat/bin
+./startup.sh
+http://ec2-54-169-54-145.ap-southeast-1.compute.amazonaws.com:8080/
+echo $PATH
+ln -s /opt/tomcat/bin/startup.sh /usr/local/bin/tomcatup
+ln -s /opt/tomcat/bin/shutdown.sh /usr/local/bin/tomcatdown
+
+**If you want to change the port number from default 8080 to any other for example 8090
+cd /opt/tomcat/conf
+vi server.xml > Change to Connector port="8090"
+
+Restart the tomcat
+# tomcatdown && tomcatup
+
+Open the browser and see 
+http://ec2-54-169-54-145.ap-southeast-1.compute.amazonaws.com:8080/
+
+Click on manager app and its shows its blocked we have to do few more steps to access that.
+
+find . / -name context.xml
+
+vi /opt/tomcat/webapps/host-manager/META-INF/context.xml for 2 files do the same
+vi /etc/sysconfig/tomcat/webapps/manager/META-INF/context.xml
+
+<!--  <Valve className  End  /> -->
+
+tomcatdown && tomcatup
+
+http://ec2-54-169-54-145.ap-southeast-1.compute.amazonaws.com:8090/
+
+click on manager app
+Now create roles and users
+
+vi tomcat-users.xml
+
+go to between the users 
 
 -->
-<!--
-  <role rolename="tomcat"/>
-  <role rolename="role1"/>
-  <user username="tomcat" password="<must-be-changed>" roles="tomcat"/>
-  <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
-  <user username="role1" password="<must-be-changed>" roles="role1"/>
--->
-    <user username="admin" password="password" roles="manager-gui,admin-gui"/>
+ <role rolename="admin-gui"/>
+ <role rolename="manager-gui"/>
+ <role rolename="manager-script"/>
+ <role rolename="manager-jmx"/>
+ <role rolename="manager-status"/>
+
+ <user username="admin" password="Password" fullName="Administrator" roles="admin-gui,manager-gui,manager-script,manager-jmx,manager-status"/>
 </tomcat-users>
 
 
-
-cat /opt/apache-tomcat-8.5.58/webapps/host-manager/META-INF/context.xml
-
-
--->
-<Context antiResourceLocking="false" privileged="true" >
- <!--<Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />-->
-  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
-</Context>
+http://ec2-54-169-54-145.ap-southeast-1.compute.amazonaws.com:8090/ click on manager app username admin password Password 
 
 
-https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04
 
-https://linuxtechlab.com/complete-guide-apache-tomcat-installation-linux/
++++++++++++++++++++++++++++++++++++++++++++
