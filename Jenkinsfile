@@ -22,9 +22,19 @@ pipeline {
                 echo 'Testing..'
             }
         }
+        stage('QA') {
+            steps {
+                echo 'QA..'
+            }
+        }
         stage('UnitTesting') {
             steps {
                 echo 'Unit Testing is in Progress..'
+            }
+        }
+        stage('Monitor') {
+            steps {
+                echo 'Monitoring..'
             }
         }
         stage('Deploy') {
