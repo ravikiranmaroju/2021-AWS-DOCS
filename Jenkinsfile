@@ -9,7 +9,12 @@ pipeline {
         }
         stage('Prepare') {
             steps {
-                echo 'Preparing for the Build..'
+                echo 'Prepared Succesfully..'
+            }
+        }
+        stage('Compile') {
+            steps {
+                echo 'Compiled Succesfully..'
             }
         }
         stage('Build') {
