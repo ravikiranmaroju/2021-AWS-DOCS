@@ -18,9 +18,9 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 +++++++++++++++++++++++++++++++++++++++++++
 
-Maven Install
+Maven, Git, Docker Install
 
-yum install maven -y
+yum install maven git docker -y
 
 +++++++++++++++++++++++++++++++++++++++++++
 
@@ -60,7 +60,7 @@ Click on manager app and its shows its blocked we have to do few more steps to a
 find . / -name context.xml
 
 vi /opt/tomcat/webapps/host-manager/META-INF/context.xml for 2 files do the same
-vi /etc/sysconfig/tomcat/webapps/manager/META-INF/context.xml
+vi /opt/tomcat/webapps/manager/META-INF/context.xml
 
 <!--  <Valve className  End  /> -->
 
@@ -70,6 +70,8 @@ http://ec2-54-169-54-145.ap-southeast-1.compute.amazonaws.com:8090/
 
 click on manager app
 Now create roles and users
+
+find . / -name tomcat-users.xml
 
 vi tomcat-users.xml
 
